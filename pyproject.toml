@@ -1,0 +1,41 @@
+[tool.poetry]
+name = "food-manager"
+version = "0.1.0"
+description = "A manager for all things food"
+authors = ["Nicola De Angeli <112023843+niqodea@users.noreply.github.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+balloons = { path = "deps/balloons", develop = true }
+
+[tool.poetry.group.dev.dependencies]
+pytest = "*"
+
+# Linters
+mypy = "*"
+ruff = "*"
+
+[tool.mypy]
+explicit_package_bases = true
+mypy_path = "src"
+exclude = "deps"
+
+[tool.ruff]
+include = ["src"]
+
+[tool.ruff.lint]
+select = [
+  "B",  # flake8-bugbear
+  "E",  # pycodestyle
+  "F",  # Pyflakes
+  "I",  # isort
+  "SIM",  # flake8-simplify
+  "UP",  # pyupgrade
+]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
