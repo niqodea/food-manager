@@ -156,7 +156,6 @@ class FoodMixtures(Enum):
 
 
 class Foods(Enum):
-    
     BANANA = Food(
         type_=FoodTypes.BANANA.value,
         mixture=FoodMixtures.BANANA.value,
@@ -198,6 +197,7 @@ class Foods(Enum):
         ),
         grams=29.0,
     ).to_named("macchiato-coffee")
+
 
 balloonist_factory = create_balloonist_factory(JSON_DATABASE_PATH)
 
