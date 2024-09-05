@@ -126,6 +126,64 @@ class Ration(Balloon):
 
 
 # --------------------------------------------------------------------------------------
+@balloon
+class Money(Balloon):
+    """
+    An amount of money.
+    """
+
+    units: int
+    """
+    The amount of money units.
+    """
+    cents: int
+    """
+    The amount of money cents.
+    """
+
+
+@balloon
+class Product(Balloon):
+    """
+    A grocery product.
+    """
+
+
+@balloon
+class RationProduct(Product):
+    """
+    A grocery product for a ration.
+    """
+
+    item: Ration
+    """
+    The ration of the product.
+    """
+
+    price: Money
+    """
+    The price of the product.
+    """
+
+
+@balloon
+class SubstanceProduct(Product):
+    """
+    A grocery product for a substance.
+    """
+
+    item: Substance
+    """
+    The substance of the product.
+    """
+
+    kg_price: Money
+    """
+    The price of the product per kilogram.
+    """
+
+
+# --------------------------------------------------------------------------------------
 def create_balloonist_factory(json_database_path: Path) -> BalloonistFactory:
     """
     Create a BalloonistFactory for the Food Manager schema.
@@ -134,9 +192,10 @@ def create_balloonist_factory(json_database_path: Path) -> BalloonistFactory:
     """
     return BalloonistFactory.create(
         top_namespace_types={
-            Ration,
             Category,
             Substance,
+            Ration,
+            Product,
         },
         types_={
             Category,
@@ -147,8 +206,10 @@ def create_balloonist_factory(json_database_path: Path) -> BalloonistFactory:
             CompositeSubstance.Component,
             DehydratedSubstance,
             Ration,
+            Money,
+            Product,
+            RationProduct,
+            SubstanceProduct,
         },
         json_database_path=json_database_path,
     )
-
-
