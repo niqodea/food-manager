@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from food_manager.schema import (
     DehydratedFoodMixture,
-    DetailedFoodMixture,
+    CompositeFoodMixture,
     Food,
     FoodMixture,
     FoodType,
@@ -36,18 +36,18 @@ class MacroGrams:
 def get_macro_ratios(food_mixture: FoodMixture) -> MacroRatios:
     if isinstance(food_mixture, SimpleFoodMixture):
         return food_mixture.macros
-    if isinstance(food_mixture, DetailedFoodMixture):
+    if isinstance(food_mixture, CompositeFoodMixture):
         carb = 0.0
         fat = 0.0
         protein = 0.0
         total_proportion = 0.0
-        for ingredient in food_mixture.ingredients.values():
-            ingredient_macro_ratios = get_macro_ratios(ingredient.mixture)
+        for component in food_mixture.components.values():
+            component_macro_ratios = get_macro_ratios(component.mixture)
 
-            carb += ingredient_macro_ratios.carb * ingredient.proportion
-            fat += ingredient_macro_ratios.fat * ingredient.proportion
-            protein += ingredient_macro_ratios.protein * ingredient.proportion
-            total_proportion += ingredient.proportion
+            carb += component_macro_ratios.carb * component.proportion
+            fat += component_macro_ratios.fat * component.proportion
+            protein += component_macro_ratios.protein * component.proportion
+            total_proportion += component.proportion
         carb /= total_proportion
         fat /= total_proportion
         protein /= total_proportion
@@ -78,16 +78,16 @@ def get_calories(macro_grams: MacroGrams) -> float:
 def get_food_type_proportions(food_mixture: FoodMixture) -> dict[FoodType, float]:
     if isinstance(food_mixture, SimpleFoodMixture):
         return {food_mixture.type_: 1.0}
-    if isinstance(food_mixture, DetailedFoodMixture):
+    if isinstance(food_mixture, CompositeFoodMixture):
         proportions: dict[FoodType, float] = {}
         total_proportion = 0.0
-        for ingredient in food_mixture.ingredients.values():
-            ingredient_proportions = get_food_type_proportions(ingredient.mixture)
-            for food_type, proportion in ingredient_proportions.items():
+        for component in food_mixture.components.values():
+            component_proportions = get_food_type_proportions(component.mixture)
+            for food_type, proportion in component_proportions.items():
                 proportions[food_type] = (
-                    proportions.get(food_type, 0.0) + proportion * ingredient.proportion
+                    proportions.get(food_type, 0.0) + proportion * component.proportion
                 )
-            total_proportion += ingredient.proportion
+            total_proportion += component.proportion
         for food_type in proportions:
             proportions[food_type] /= total_proportion
         return proportions

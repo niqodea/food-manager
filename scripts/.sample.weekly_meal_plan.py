@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 from food_manager.path import JSON_DATABASE_PATH
 from food_manager.schema import (
-    DetailedFoodMixture,
+    CompositeFoodMixture,
     Food,
     FoodMixture,
     FoodType,
@@ -84,10 +84,10 @@ def portion_food(food_mixture: FoodMixture, grams: float) -> Food:
 def blend_food(type_: FoodType, food_mixture_grams: dict[FoodMixture, float]) -> Food:
     return Food(
         type_=type_,
-        mixture=DetailedFoodMixture(
+        mixture=CompositeFoodMixture(
             type_=type_,
-            ingredients={
-                food_mixture.type_: DetailedFoodMixture.Ingredient(
+            components={
+                food_mixture.type_: CompositeFoodMixture.Component(
                     mixture=food_mixture,
                     proportion=grams,
                 )

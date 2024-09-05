@@ -22,8 +22,8 @@ def create_balloonist_factory(json_database_path: Path) -> BalloonistFactory:
             FoodType,
             FoodMixture,
             SimpleFoodMixture,
-            DetailedFoodMixture,
-            DetailedFoodMixture.Ingredient,
+            CompositeFoodMixture,
+            CompositeFoodMixture.Component,
             DehydratedFoodMixture,
             MacroRatios,
         },
@@ -83,29 +83,29 @@ class SimpleFoodMixture(FoodMixture):
 
 
 @balloon
-class DetailedFoodMixture(FoodMixture):
+class CompositeFoodMixture(FoodMixture):
     """
-    A detailed food mixture.
+    A composite food mixture.
     """
 
     @balloon
-    class Ingredient(Balloon):
+    class Component(Balloon):
         """
-        An ingredient in a detailed food mixture.
+        An component in a composite food mixture.
         """
 
         mixture: FoodMixture
         """
-        The mixture of the ingredient.
+        The mixture of the component.
         """
         proportion: float
         """
-        The proportion of the ingredient in the detailed food mixture.
+        The proportion of the component in the composite food mixture.
         """
 
-    ingredients: dict[FoodType, Ingredient]
+    components: dict[FoodType, Component]
     """
-    The ingredients in the detailed food mixture.
+    The components in the composite food mixture.
     """
 
 

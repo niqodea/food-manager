@@ -2,8 +2,8 @@ from enum import Enum
 
 from food_manager.path import JSON_DATABASE_PATH
 from food_manager.schema import (
+    CompositeFoodMixture,
     DehydratedFoodMixture,
-    DetailedFoodMixture,
     Food,
     FoodMixture,
     FoodType,
@@ -92,38 +92,38 @@ class FoodMixtures(Enum):
 
     # =================================================================================
 
-    SAUTEED_CHICKEN = DetailedFoodMixture(
+    SAUTEED_CHICKEN = CompositeFoodMixture(
         type_=FoodTypes.SAUTEED_CHICKEN.value,
-        ingredients={
-            FoodTypes.CHICKEN.value: DetailedFoodMixture.Ingredient(
+        components={
+            FoodTypes.CHICKEN.value: CompositeFoodMixture.Component(
                 mixture=LOCAL_BUTCHER_CHICKEN,
                 proportion=200.0,
             ),
-            FoodTypes.OLIVE_OIL.value: DetailedFoodMixture.Ingredient(
+            FoodTypes.OLIVE_OIL.value: CompositeFoodMixture.Component(
                 mixture=OLIVE_OIL,
                 proportion=1.0,
             ),
         },
     ).to_named("sauteed-chicken")
 
-    SAUTEED_TUNA = DetailedFoodMixture(
+    SAUTEED_TUNA = CompositeFoodMixture(
         type_=FoodTypes.SAUTEED_TUNA.value,
-        ingredients={
-            FoodTypes.TUNA.value: DetailedFoodMixture.Ingredient(
+        components={
+            FoodTypes.TUNA.value: CompositeFoodMixture.Component(
                 mixture=FISH_MARKET_TUNA,
                 proportion=100.0,
             ),
-            FoodTypes.OLIVE_OIL.value: DetailedFoodMixture.Ingredient(
+            FoodTypes.OLIVE_OIL.value: CompositeFoodMixture.Component(
                 mixture=OLIVE_OIL,
                 proportion=1.0,
             ),
         },
     ).to_named("sauteed-tuna")
 
-    EGGPLANT_PARMESAN = DetailedFoodMixture(
+    EGGPLANT_PARMESAN = CompositeFoodMixture(
         type_=FoodTypes.EGGPLANT_PARMESAN.value,
-        ingredients={
-            FoodTypes.DEHYDRATED_EGGPLANT.value: DetailedFoodMixture.Ingredient(
+        components={
+            FoodTypes.DEHYDRATED_EGGPLANT.value: CompositeFoodMixture.Component(
                 mixture=DehydratedFoodMixture(
                     type_=FoodTypes.DEHYDRATED_EGGPLANT.value,
                     original_mixture=LOCAL_FARMER_EGGPLANT,
@@ -131,23 +131,23 @@ class FoodMixtures(Enum):
                 ),
                 proportion=550.0,
             ),
-            FoodTypes.TOMATO_SAUCE.value: DetailedFoodMixture.Ingredient(
+            FoodTypes.TOMATO_SAUCE.value: CompositeFoodMixture.Component(
                 mixture=BRANDED_TOMATO_SAUCE,
                 proportion=700.0,
             ),
-            FoodTypes.MOZZARELLA.value: DetailedFoodMixture.Ingredient(
+            FoodTypes.MOZZARELLA.value: CompositeFoodMixture.Component(
                 mixture=BRANDED_MOZZARELLA,
                 proportion=200.0,
             ),
-            FoodTypes.PARMESAN.value: DetailedFoodMixture.Ingredient(
+            FoodTypes.PARMESAN.value: CompositeFoodMixture.Component(
                 mixture=PARMESAN,
                 proportion=125.0,
             ),
-            FoodTypes.PEANUT_SEED_OIL.value: DetailedFoodMixture.Ingredient(
+            FoodTypes.PEANUT_SEED_OIL.value: CompositeFoodMixture.Component(
                 mixture=PEANUT_SEED_OIL,
                 proportion=50.0,
             ),
-            FoodTypes.OLIVE_OIL.value: DetailedFoodMixture.Ingredient(
+            FoodTypes.OLIVE_OIL.value: CompositeFoodMixture.Component(
                 mixture=OLIVE_OIL,
                 proportion=20.0,
             ),
@@ -164,14 +164,14 @@ class Foods(Enum):
 
     GREEK_YOGURT = Food(
         type_=FoodTypes.GREEK_YOGURT.value,
-        mixture=DetailedFoodMixture(
+        mixture=CompositeFoodMixture(
             type_=FoodTypes.GREEK_YOGURT.value,
-            ingredients={
-                FoodTypes.GREEK_YOGURT.value: DetailedFoodMixture.Ingredient(
+            components={
+                FoodTypes.GREEK_YOGURT.value: CompositeFoodMixture.Component(
                     mixture=FoodMixtures.BRANDED_GREEK_YOGURT.value,
                     proportion=60.0,
                 ),
-                FoodTypes.SUGAR.value: DetailedFoodMixture.Ingredient(
+                FoodTypes.SUGAR.value: CompositeFoodMixture.Component(
                     mixture=FoodMixtures.SUGAR.value,
                     proportion=7.0,
                 ),
@@ -182,14 +182,14 @@ class Foods(Enum):
 
     COFFEE = Food(
         type_=FoodTypes.MACCHIATO_COFFEE.value,
-        mixture=DetailedFoodMixture(
+        mixture=CompositeFoodMixture(
             type_=FoodTypes.MACCHIATO_COFFEE.value,
-            ingredients={
-                FoodTypes.COFFEE.value: DetailedFoodMixture.Ingredient(
+            components={
+                FoodTypes.COFFEE.value: CompositeFoodMixture.Component(
                     mixture=FoodMixtures.COFFEE.value,
                     proportion=25.0,
                 ),
-                FoodTypes.SUGAR.value: DetailedFoodMixture.Ingredient(
+                FoodTypes.SUGAR.value: CompositeFoodMixture.Component(
                     mixture=FoodMixtures.SUGAR.value,
                     proportion=4.0,
                 ),
