@@ -7,9 +7,9 @@ from balloons import Balloon, BalloonistFactory, balloon
 
 # --------------------------------------------------------------------------------------
 @balloon
-class Ingredient(Balloon):
+class Category(Balloon):
     """
-    A food ingredient.
+    A food category.
     """
 
 
@@ -38,65 +38,65 @@ class MacroRatios(Balloon):
 
 # --------------------------------------------------------------------------------------
 @balloon
-class FoodMixture(Balloon):
+class Substance(Balloon):
     """
-    A mixture making up a food item.
+    A food substance.
     """
 
-    ingredient: Ingredient
+    category: Category
     """
-    The ingredient of the food mixture.
+    The category of the food substance.
     """
 
 
 @balloon
-class SimpleFoodMixture(FoodMixture):
+class SimpleSubstance(Substance):
     """
-    A simple food mixture.
+    A simple food substance.
     """
 
     macros: MacroRatios
     """
-    The macronutrient ratios of the food mixture.
+    The macronutrient ratios of the substance.
     """
 
 
 @balloon
-class CompositeFoodMixture(FoodMixture):
+class CompositeSubstance(Substance):
     """
-    A composite food mixture.
+    A composite food substance.
     """
 
     @balloon
     class Component(Balloon):
         """
-        An component in a composite food mixture.
+        A component in the composite substance.
         """
 
-        mixture: FoodMixture
+        substance: Substance
         """
-        The mixture of the component.
+        The substance of the component.
         """
         proportion: float
         """
-        The proportion of the component in the composite food mixture.
+        The proportion of the component in the composite substance.
         """
 
-    components: dict[Ingredient, Component]
+    components: dict[Category, Component]
     """
-    The components in the composite food mixture.
+    The components in the composite substance.
     """
 
 
 @balloon
-class DehydratedFoodMixture(FoodMixture):
+class DehydratedSubstance(Substance):
     """
-    A dehydrated food mixture.
+    A dehydrated food substance.
     """
 
-    original_mixture: FoodMixture
+    original_substance: Substance
     """
-    The original food mixture before dehydration.
+    The original substance before dehydration.
     """
     dehydration_ratio: float
     """
@@ -106,22 +106,22 @@ class DehydratedFoodMixture(FoodMixture):
 
 # --------------------------------------------------------------------------------------
 @balloon
-class Food(Balloon):
+class Ration(Balloon):
     """
-    A food item.
+    A food ration.
     """
 
-    ingredient: ingredient
+    category: Category
     """
-    The ingredient of the food.
+    The category of the ration.
     """
-    mixture: FoodMixture
+    substance: Substance
     """
-    The mixture of the food.
+    The substance of the ration.
     """
     grams: float
     """
-    The weight of the food in grams.
+    The weight of the ration in grams.
     """
 
 
@@ -134,19 +134,19 @@ def create_balloonist_factory(json_database_path: Path) -> BalloonistFactory:
     """
     return BalloonistFactory.create(
         top_namespace_types={
-            Food,
-            Ingredient,
-            FoodMixture,
+            Ration,
+            Category,
+            Substance,
         },
         types_={
-            Ingredient,
+            Category,
             MacroRatios,
-            FoodMixture,
-            SimpleFoodMixture,
-            CompositeFoodMixture,
-            CompositeFoodMixture.Component,
-            DehydratedFoodMixture,
-            Food,
+            Substance,
+            SimpleSubstance,
+            CompositeSubstance,
+            CompositeSubstance.Component,
+            DehydratedSubstance,
+            Ration,
         },
         json_database_path=json_database_path,
     )

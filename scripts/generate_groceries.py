@@ -1,17 +1,17 @@
 from weekly_meal_plan import WEEKLY_MEAL_PLAN
 
-from food_manager.utils import get_ingredient_grams
+from food_manager.utils import get_category_grams
 
-ingredient_grams: dict[str, float] = {}
+category_grams: dict[str, float] = {}
 for daily_meal_plan in WEEKLY_MEAL_PLAN.dailies.values():
     for meal in daily_meal_plan.meals.values():
-        for food in meal.foods.values():
-            for ingredient, grams in get_ingredient_grams(food).items():
-                ingredient_name = ingredient.as_named().name
-                ingredient_grams[ingredient_name] = (
-                    ingredient_grams.get(ingredient_name, 0.0) + grams
+        for food in meal.rations.values():
+            for category, grams in get_category_grams(food).items():
+                category_name = category.as_named().name
+                category_grams[category_name] = (
+                    category_grams.get(category_name, 0.0) + grams
                 )
 
 print("Grocery list:")
-for ingredient_name, grams in sorted(ingredient_grams.items(), key=lambda item: item[0]):
-    print(f"{grams:6.0f}g {ingredient_name}")
+for category_name, grams in sorted(category_grams.items(), key=lambda item: item[0]):
+    print(f"{grams:6.0f}g {category_name}")

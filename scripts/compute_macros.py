@@ -24,13 +24,13 @@ for day_name, daily_meal_plan in WEEKLY_MEAL_PLAN.dailies.items():
     total_protein = 0.0
     for meal_type, meal in daily_meal_plan.meals.items():
         print(f"{YELLOW}{meal_type.capitalize()}:{RESET}")
-        for food in meal.foods.values():
-            macro_grams = get_macro_grams(food)
+        for ration in meal.rations.values():
+            macro_grams = get_macro_grams(ration)
             calories = get_calories(macro_grams)
 
-            food_name = food.type_.as_named().name
+            category = ration.category.as_named().name
             carb_budget = macro_grams.carb / CARB_BUDGET_GRAMS * 100
-            print(f"  {GREEN}{food_name}{RESET}: {calories:.0f} calories")
+            print(f"  {GREEN}{category}{RESET}: {calories:.0f} calories")
             print(f"    {macro_grams.carb:6.1f}g carb ({carb_budget:3.0f}%)")
             print(f"    {macro_grams.fat:6.1f}g fat")
             print(f"    {macro_grams.protein:6.1f}g protein")

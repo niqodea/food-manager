@@ -4,18 +4,18 @@ from dataclasses import dataclass
 
 from food_manager.path import JSON_DATABASE_PATH
 from food_manager.schema import (
-    CompositeFoodMixture,
-    Food,
-    FoodMixture,
-    Ingredient,
+    CompositeSubstance,
+    Category,
+    Ration,
+    Substance,
     create_balloonist_factory,
 )
 
 balloonist_factory = create_balloonist_factory(JSON_DATABASE_PATH)
 
-ingredients = balloonist_factory.instantiate(Ingredient)
-food_mixtures = balloonist_factory.instantiate(FoodMixture)
-foods = balloonist_factory.instantiate(Food)
+categories = balloonist_factory.instantiate(Category)
+substances = balloonist_factory.instantiate(Substance)
+rations = balloonist_factory.instantiate(Ration)
 
 
 def make_weekly_meal_plan(
@@ -52,112 +52,112 @@ class DailyMealPlan:
 
 @dataclass
 class Meal:
-    foods: dict[Ingredient, Food]
+    rations: dict[Category, Ration]
 
 
 def make_daily_meal_plan(
-    breakfast: dict[Ingredient, Food] | None = None,
-    lunch: dict[Ingredient, Food] | None = None,
-    dinner: dict[Ingredient, Food] | None = None,
+    breakfast: dict[Category, Ration] | None = None,
+    lunch: dict[Category, Ration] | None = None,
+    dinner: dict[Category, Ration] | None = None,
 ) -> DailyMealPlan:
     meals = {}
     if breakfast is not None:
-        meals["breakfast"] = Meal(foods=breakfast)
+        meals["breakfast"] = Meal(rations=breakfast)
     if lunch is not None:
-        meals["lunch"] = Meal(foods=lunch)
+        meals["lunch"] = Meal(rations=lunch)
     if dinner is not None:
-        meals["dinner"] = Meal(foods=dinner)
+        meals["dinner"] = Meal(rations=dinner)
     return DailyMealPlan(meals=meals)
 
 
-def index_foods(*foods: Food) -> dict[Ingredient, Food]:
-    indexed_foods = {food.ingredient: food for food in foods}
-    if len(indexed_foods) < len(foods):
-        raise ValueError("Found duplicate ingredient")
-    return indexed_foods
+def index_rations(*rations: Ration) -> dict[Category, Ration]:
+    indexed_rations = {ration.category: ration for ration in rations}
+    if len(indexed_rations) < len(rations):
+        raise ValueError("Found duplicate category")
+    return indexed_rations
 
 
-def portion_food(food_mixture: FoodMixture, grams: float) -> Food:
-    return Food(ingredient=food_mixture.type_, mixture=food_mixture, grams=grams)
+def get_ration_from_substance(substance: Substance, grams: float) -> Ration:
+    return Ration(category=substance.type_, substance=substance, grams=grams)
 
 
-def blend_food(type_: Ingredient, food_mixture_grams: dict[FoodMixture, float]) -> Food:
-    return Food(
-        ingredient=type_,
-        mixture=CompositeFoodMixture(
+def get_ration_from_substances(type_: Category, substance_grams: dict[Substance, float]) -> Ration:
+    return Ration(
+        category=type_,
+        substance=CompositeSubstance(
             type_=type_,
             components={
-                food_mixture.type_: CompositeFoodMixture.Component(
-                    mixture=food_mixture,
+                substance.type_: CompositeSubstance.Component(
+                    substance=substance,
                     proportion=grams,
                 )
-                for food_mixture, grams in food_mixture_grams.items()
+                for substance, grams in substance_grams.items()
             },
         ),
-        grams=sum(food_mixture_grams.values()),
+        grams=sum(substance_grams.values()),
     )
 
 
 WEEKLY_MEAL_PLAN = make_weekly_meal_plan(
     monday=make_daily_meal_plan(
-        breakfast=index_foods(
-            foods.get("greek-yogurt"),
-            foods.get("coffee"),
+        breakfast=index_rations(
+            rations.get("greek-yogurt"),
+            rations.get("coffee"),
         ),
-        lunch=index_foods(
-            portion_food(
-                food_mixtures.get("sauteed-chicken"),
+        lunch=index_rations(
+            get_ration_from_substance(
+                substances.get("sauteed-chicken"),
                 grams=260.0,
             ),
         ),
-        dinner=index_foods(
-            portion_food(
-                food_mixtures.get("sauteed-tuna"),
+        dinner=index_rations(
+            get_ration_from_substance(
+                substances.get("sauteed-tuna"),
                 grams=200.0,
             ),
         ),
     ),
     tuesday=make_daily_meal_plan(
-        breakfast=index_foods(
-            foods.get("banana"),
+        breakfast=index_rations(
+            rations.get("banana"),
         ),
-        lunch=index_foods(
-            portion_food(
-                food_mixtures.get("salad"),
+        lunch=index_rations(
+            get_ration_from_substance(
+                substances.get("salad"),
                 grams=200.0,
             ),
         ),
-        dinner=index_foods(
-            portion_food(
-                food_mixtures.get("eggplant-parmesan"),
+        dinner=index_rations(
+            get_ration_from_substance(
+                substances.get("eggplant-parmesan"),
                 grams=250.0,
             ),
-            foods.get("coffee"),
+            rations.get("coffee"),
         ),
     ),
     wednesday=make_daily_meal_plan(
-        # breakfast=index_foods(),
-        # lunch=index_foods(),
-        # dinner=index_foods(),
+        # breakfast=index_rations(),
+        # lunch=index_rations(),
+        # dinner=index_rations(),
     ),
     thursday=make_daily_meal_plan(
-        # breakfast=index_foods(),
-        # lunch=index_foods(),
-        # dinner=index_foods(),
+        # breakfast=index_rations(),
+        # lunch=index_rations(),
+        # dinner=index_rations(),
     ),
     friday=make_daily_meal_plan(
-        # breakfast=index_foods(),
-        # lunch=index_foods(),
-        # dinner=index_foods(),
+        # breakfast=index_rations(),
+        # lunch=index_rations(),
+        # dinner=index_rations(),
     ),
     saturday=make_daily_meal_plan(
-        # breakfast=index_foods(),
-        # lunch=index_foods(),
-        # dinner=index_foods(),
+        # breakfast=index_rations(),
+        # lunch=index_rations(),
+        # dinner=index_rations(),
     ),
     sunday=make_daily_meal_plan(
-        # breakfast=index_foods(),
-        # lunch=index_foods(),
-        # dinner=index_foods(),
+        # breakfast=index_rations(),
+        # lunch=index_rations(),
+        # dinner=index_rations(),
     ),
 )
