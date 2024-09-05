@@ -1,6 +1,6 @@
 from enum import Enum
 
-from food_manager.path import JSON_DATABASE_PATH
+from food_manager.path import DATA_PATH
 from food_manager.schema import (
     CompositeSubstance,
     DehydratedSubstance,
@@ -199,7 +199,7 @@ class Rations(Enum):
     ).to_named("macchiato-coffee")
 
 
-balloonist_factory = create_balloonist_factory(JSON_DATABASE_PATH)
+balloonist_factory = create_balloonist_factory(DATA_PATH)
 
 category_balloonist = balloonist_factory.instantiate(Category)
 substance_balloonist = balloonist_factory.instantiate(Substance)

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from food_manager.path import JSON_DATABASE_PATH
+from food_manager.path import DATA_PATH
 from food_manager.schema import (
     CompositeSubstance,
     Category,
@@ -11,7 +11,7 @@ from food_manager.schema import (
     create_balloonist_factory,
 )
 
-balloonist_factory = create_balloonist_factory(JSON_DATABASE_PATH)
+balloonist_factory = create_balloonist_factory(DATA_PATH)
 
 categories = balloonist_factory.instantiate(Category)
 substances = balloonist_factory.instantiate(Substance)
