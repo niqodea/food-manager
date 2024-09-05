@@ -7,13 +7,13 @@ from food_manager.schema import (
     CompositeFoodMixture,
     Food,
     FoodMixture,
-    FoodType,
+    Ingredient,
     create_balloonist_factory,
 )
 
 balloonist_factory = create_balloonist_factory(JSON_DATABASE_PATH)
 
-food_types = balloonist_factory.instantiate(FoodType)
+ingredients = balloonist_factory.instantiate(Ingredient)
 food_mixtures = balloonist_factory.instantiate(FoodMixture)
 foods = balloonist_factory.instantiate(Food)
 
@@ -52,13 +52,13 @@ class DailyMealPlan:
 
 @dataclass
 class Meal:
-    foods: dict[FoodType, Food]
+    foods: dict[Ingredient, Food]
 
 
 def make_daily_meal_plan(
-    breakfast: dict[FoodType, Food] | None = None,
-    lunch: dict[FoodType, Food] | None = None,
-    dinner: dict[FoodType, Food] | None = None,
+    breakfast: dict[Ingredient, Food] | None = None,
+    lunch: dict[Ingredient, Food] | None = None,
+    dinner: dict[Ingredient, Food] | None = None,
 ) -> DailyMealPlan:
     meals = {}
     if breakfast is not None:
@@ -70,20 +70,20 @@ def make_daily_meal_plan(
     return DailyMealPlan(meals=meals)
 
 
-def index_foods(*foods: Food) -> dict[FoodType, Food]:
-    indexed_foods = {food.type_: food for food in foods}
+def index_foods(*foods: Food) -> dict[Ingredient, Food]:
+    indexed_foods = {food.ingredient: food for food in foods}
     if len(indexed_foods) < len(foods):
-        raise ValueError("Duplicate food types")
+        raise ValueError("Found duplicate ingredient")
     return indexed_foods
 
 
 def portion_food(food_mixture: FoodMixture, grams: float) -> Food:
-    return Food(type_=food_mixture.type_, mixture=food_mixture, grams=grams)
+    return Food(ingredient=food_mixture.type_, mixture=food_mixture, grams=grams)
 
 
-def blend_food(type_: FoodType, food_mixture_grams: dict[FoodMixture, float]) -> Food:
+def blend_food(type_: Ingredient, food_mixture_grams: dict[FoodMixture, float]) -> Food:
     return Food(
-        type_=type_,
+        ingredient=type_,
         mixture=CompositeFoodMixture(
             type_=type_,
             components={

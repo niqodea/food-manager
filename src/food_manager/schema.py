@@ -5,68 +5,47 @@ from pathlib import Path
 from balloons import Balloon, BalloonistFactory, balloon
 
 
-def create_balloonist_factory(json_database_path: Path) -> BalloonistFactory:
-    """
-    Create a BalloonistFactory for the Food Manager schema.
-
-    :param json_database_path: The path to the JSON database.
-    """
-    return BalloonistFactory.create(
-        top_namespace_types={
-            Food,
-            FoodType,
-            FoodMixture,
-        },
-        types_={
-            Food,
-            FoodType,
-            FoodMixture,
-            SimpleFoodMixture,
-            CompositeFoodMixture,
-            CompositeFoodMixture.Component,
-            DehydratedFoodMixture,
-            MacroRatios,
-        },
-        json_database_path=json_database_path,
-    )
-
-
+# --------------------------------------------------------------------------------------
 @balloon
-class Food(Balloon):
+class Ingredient(Balloon):
     """
-    A food item.
-    """
-
-    type_: FoodType
-    """
-    The type of food.
-    """
-    mixture: FoodMixture
-    """
-    The mixture of the food.
-    """
-    grams: float
-    """
-    The weight of the food in grams.
+    A food ingredient.
     """
 
 
+# --------------------------------------------------------------------------------------
 @balloon
-class FoodType(Balloon):
+class MacroRatios(Balloon):
     """
-    A type of food.
+    The ratios of macronutrients in a food.
+    """
+
+    carb: float
+    """
+    The ratio of carbohydrates in the food.
+    """
+
+    fat: float
+    """
+    The ratio of fat in the food.
+    """
+
+    protein: float
+    """
+    The ratio of protein in the food.
     """
 
 
+# --------------------------------------------------------------------------------------
 @balloon
 class FoodMixture(Balloon):
     """
     A mixture making up a food item.
     """
 
-    type_: FoodType
+    ingredient: Ingredient
     """
-    The type of food mixture.
+    The ingredient of the food mixture.
     """
 
 
@@ -103,7 +82,7 @@ class CompositeFoodMixture(FoodMixture):
         The proportion of the component in the composite food mixture.
         """
 
-    components: dict[FoodType, Component]
+    components: dict[Ingredient, Component]
     """
     The components in the composite food mixture.
     """
@@ -125,23 +104,51 @@ class DehydratedFoodMixture(FoodMixture):
     """
 
 
+# --------------------------------------------------------------------------------------
 @balloon
-class MacroRatios(Balloon):
+class Food(Balloon):
     """
-    The ratios of macronutrients in a food.
-    """
-
-    carb: float
-    """
-    The ratio of carbohydrates in the food.
+    A food item.
     """
 
-    fat: float
+    ingredient: ingredient
     """
-    The ratio of fat in the food.
+    The ingredient of the food.
+    """
+    mixture: FoodMixture
+    """
+    The mixture of the food.
+    """
+    grams: float
+    """
+    The weight of the food in grams.
     """
 
-    protein: float
+
+# --------------------------------------------------------------------------------------
+def create_balloonist_factory(json_database_path: Path) -> BalloonistFactory:
     """
-    The ratio of protein in the food.
+    Create a BalloonistFactory for the Food Manager schema.
+
+    :param json_database_path: The path to the JSON database.
     """
+    return BalloonistFactory.create(
+        top_namespace_types={
+            Food,
+            Ingredient,
+            FoodMixture,
+        },
+        types_={
+            Ingredient,
+            MacroRatios,
+            FoodMixture,
+            SimpleFoodMixture,
+            CompositeFoodMixture,
+            CompositeFoodMixture.Component,
+            DehydratedFoodMixture,
+            Food,
+        },
+        json_database_path=json_database_path,
+    )
+
+

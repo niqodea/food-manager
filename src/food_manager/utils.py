@@ -5,7 +5,7 @@ from food_manager.schema import (
     CompositeFoodMixture,
     Food,
     FoodMixture,
-    FoodType,
+    Ingredient,
     MacroRatios,
     SimpleFoodMixture,
 )
@@ -75,34 +75,34 @@ def get_calories(macro_grams: MacroGrams) -> float:
     return 4 * macro_grams.carb + 9 * macro_grams.fat + 4 * macro_grams.protein
 
 
-def get_food_type_proportions(food_mixture: FoodMixture) -> dict[FoodType, float]:
+def get_ingredient_proportions(food_mixture: FoodMixture) -> dict[Ingredient, float]:
     if isinstance(food_mixture, SimpleFoodMixture):
-        return {food_mixture.type_: 1.0}
+        return {food_mixture.ingredient: 1.0}
     if isinstance(food_mixture, CompositeFoodMixture):
-        proportions: dict[FoodType, float] = {}
+        proportions: dict[Ingredient, float] = {}
         total_proportion = 0.0
         for component in food_mixture.components.values():
-            component_proportions = get_food_type_proportions(component.mixture)
-            for food_type, proportion in component_proportions.items():
-                proportions[food_type] = (
-                    proportions.get(food_type, 0.0) + proportion * component.proportion
+            component_proportions = get_ingredient_proportions(component.mixture)
+            for ingredient, proportion in component_proportions.items():
+                proportions[ingredient] = (
+                    proportions.get(ingredient, 0.0) + proportion * component.proportion
                 )
             total_proportion += component.proportion
-        for food_type in proportions:
-            proportions[food_type] /= total_proportion
+        for ingredient in proportions:
+            proportions[ingredient] /= total_proportion
         return proportions
     if isinstance(food_mixture, DehydratedFoodMixture):
-        original_proportions = get_food_type_proportions(food_mixture.original_mixture)
+        original_proportions = get_ingredient_proportions(food_mixture.original_mixture)
         return {
-            food_type: proportion / food_mixture.dehydration_ratio
-            for food_type, proportion in original_proportions.items()
+            ingredient: proportion / food_mixture.dehydration_ratio
+            for ingredient, proportion in original_proportions.items()
         }
     raise ValueError(f"Unknown food mixture type: {food_mixture}")
 
 
-def get_food_type_grams(food: Food) -> dict[FoodType, float]:
-    food_type_proportions = get_food_type_proportions(food.mixture)
+def get_ingredient_grams(food: Food) -> dict[Ingredient, float]:
+    ingredient_proportions = get_ingredient_proportions(food.mixture)
     return {
-        food_type: food.grams * proportion
-        for food_type, proportion in food_type_proportions.items()
+        ingredient: food.grams * proportion
+        for ingredient, proportion in ingredient_proportions.items()
     }
