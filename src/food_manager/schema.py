@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from balloons import Balloon, BalloonistFactory, balloon
+from balloons import Balloon, BalloonistFactory, NamedBalloon, balloon
 
 
 # --------------------------------------------------------------------------------------
 @balloon
-class Category(Balloon):
+class Category(NamedBalloon):
     """
     A food category.
     """

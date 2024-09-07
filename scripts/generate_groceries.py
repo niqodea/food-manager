@@ -7,7 +7,7 @@ for daily_meal_plan in WEEKLY_MEAL_PLAN.dailies.values():
     for meal in daily_meal_plan.meals.values():
         for food in meal.rations.values():
             for category, grams in get_category_grams(food).items():
-                category_name = category.as_named().name
+                category_name = category.name
                 category_grams[category_name] = (
                     category_grams.get(category_name, 0.0) + grams
                 )

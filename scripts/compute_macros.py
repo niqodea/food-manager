@@ -28,7 +28,7 @@ for day_name, daily_meal_plan in WEEKLY_MEAL_PLAN.dailies.items():
             macro_grams = get_macro_grams(ration)
             calories = get_calories(macro_grams)
 
-            category = ration.category.as_named().name
+            category = ration.category.name
             carb_budget = macro_grams.carb / CARB_BUDGET_GRAMS * 100
             print(f"  {GREEN}{category}{RESET}: {calories:.0f} calories")
             print(f"    {macro_grams.carb:6.1f}g carb ({carb_budget:3.0f}%)")
