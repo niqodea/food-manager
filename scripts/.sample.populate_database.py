@@ -4,6 +4,7 @@ from food_manager.path import DATA_PATH
 from food_manager.schema import (
     CompositeSubstance,
     DehydratedSubstance,
+    DailyMealPlan,
     Ration,
     Substance,
     Category,
@@ -14,19 +15,19 @@ from food_manager.schema import (
 
 
 class Categories(Enum):
-    BANANA = Category().to_named("banana")
-    CHICKEN = Category().to_named("chicken")
-    COFFEE = Category().to_named("coffee")
-    DEHYDRATED_EGGPLANT = Category().to_named("dehydrated-eggplant")
-    EGGPLANT = Category().to_named("eggplant")
-    GREEK_YOGURT = Category().to_named("greek-yogurt")
-    MOZZARELLA = Category().to_named("mozzarella")
-    OLIVE_OIL = Category().to_named("olive-oil")
-    PARMESAN = Category().to_named("parmesan")
-    PEANUT_SEED_OIL = Category().to_named("peanut-seed-oil")
-    SUGAR = Category().to_named("sugar")
-    TOMATO_SAUCE = Category().to_named("tomato-sauce")
-    TUNA = Category().to_named("tuna")
+    BANANA = Category("banana")
+    CHICKEN = Category("chicken")
+    COFFEE = Category("coffee")
+    DEHYDRATED_EGGPLANT = Category("dehydrated-eggplant")
+    EGGPLANT = Category("eggplant")
+    GREEK_YOGURT = Category("greek-yogurt")
+    MOZZARELLA = Category("mozzarella")
+    OLIVE_OIL = Category("olive-oil")
+    PARMESAN = Category("parmesan")
+    PEANUT_SEED_OIL = Category("peanut-seed-oil")
+    SUGAR = Category("sugar")
+    TOMATO_SAUCE = Category("tomato-sauce")
+    TUNA = Category("tuna")
 
 
 class Substances(Enum):
@@ -199,11 +200,18 @@ class Rations(Enum):
     ).to_named("macchiato-coffee")
 
 
+class DailyMealPlanSlots(Enum):
+    BREAKFAST = DailyMealPlan.Slot("breakfast")
+    LUNCH = DailyMealPlan.Slot("lunch")
+    DINNER = DailyMealPlan.Slot("dinner")
+
+
 balloonist_factory = create_balloonist_factory(DATA_PATH)
 
 category_balloonist = balloonist_factory.instantiate(Category)
 substance_balloonist = balloonist_factory.instantiate(Substance)
 ration_balloonist = balloonist_factory.instantiate(Ration)
+daily_meal_plan_slot_balloonist = balloonist_factory.instantiate(DailyMealPlan.Slot)
 
 for category in Categories:
     category_balloonist.track(category.value)
@@ -211,3 +219,5 @@ for substance in Substances:
     substance_balloonist.track(substance.value)
 for ration in Rations:
     ration_balloonist.track(ration.value)
+for daily_meal_plan_slot in DailyMealPlanSlots:
+    daily_meal_plan_slot_balloonist.track(daily_meal_plan_slot.value)

@@ -21,24 +21,9 @@ class Nutrient(Enum):
     """
 
     CARB = auto()
-    """
-    Carbohydrates.
-    """
-
     FAT = auto()
-    """
-    Fat.
-    """
-
     PROTEIN = auto()
-    """
-    Protein.
-    """
-
     ETHANOL = auto()
-    """
-    Ethanol.
-    """
 
 
 # --------------------------------------------------------------------------------------
@@ -132,6 +117,60 @@ class Ration(Balloon):
 
 # --------------------------------------------------------------------------------------
 @balloon
+class Meal(Balloon):
+    """
+    A meal.
+    """
+
+    rations: dict[Category, Ration]
+    """
+    The rations of the meal
+    """
+
+
+@balloon
+class DailyMealPlan(Balloon):
+
+    meals: dict[Slot, Meal]
+    """
+    The meals of the day.
+    """
+
+    @balloon
+    class Slot(NamedBalloon):
+        """
+        A meal slot.
+        """
+
+
+@balloon
+class WeeklyMealPlan(Balloon):
+    """
+    A weekly meal plan.
+    """
+
+    dailies: dict[Day, DailyMealPlan]
+    """
+    The daily meal plans of the week.
+    """
+
+    class Day(Enum):
+        """
+        A day of the week.
+        """
+
+        MONDAY = auto()
+        TUESDAY = auto()
+        WEDNESDAY = auto()
+        THURSDAY = auto()
+        FRIDAY = auto()
+        SATURDAY = auto()
+        SUNDAY = auto()
+
+
+
+# --------------------------------------------------------------------------------------
+@balloon
 class Money(Balloon):
     """
     An amount of money.
@@ -201,6 +240,7 @@ def create_balloonist_factory(json_database_path: Path) -> BalloonistFactory:
             Substance,
             Ration,
             Product,
+            DailyMealPlan.Slot,
         },
         types_={
             Category,
@@ -210,6 +250,10 @@ def create_balloonist_factory(json_database_path: Path) -> BalloonistFactory:
             CompositeSubstance.Component,
             DehydratedSubstance,
             Ration,
+            Meal,
+            DailyMealPlan,
+            DailyMealPlan.Slot,
+            WeeklyMealPlan,
             Money,
             Product,
             RationProduct,

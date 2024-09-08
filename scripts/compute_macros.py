@@ -10,19 +10,19 @@ YELLOW = "\033[33m"
 
 RESET = "\033[0m"
 
-for day_name, daily_meal_plan in WEEKLY_MEAL_PLAN.dailies.items():
+for day, daily_meal_plan in WEEKLY_MEAL_PLAN.dailies.items():
     if len(daily_meal_plan.meals) == 0:
         continue
 
     print(YELLOW, end="")
-    print(f"{'-' * len(day_name)}")
-    print(f"{day_name.upper()}")
-    print(f"{'-' * len(day_name)}")
+    print(f"{'-' * len(day.name)}")
+    print(f"{day.name.upper()}")
+    print(f"{'-' * len(day.name)}")
     print(RESET, end="")
     total_nutrient_grams: dict[Nutrient, float] = {}
     total_calories = 0.0
-    for meal_type, meal in daily_meal_plan.meals.items():
-        print(f"{YELLOW}{meal_type.capitalize()}:{RESET}")
+    for meal_slot, meal in daily_meal_plan.meals.items():
+        print(f"{YELLOW}{meal_slot.name.capitalize()}:{RESET}")
         for ration in meal.rations.values():
             nutrient_grams = get_nutrient_grams(ration)
             calories = get_calories(nutrient_grams)
