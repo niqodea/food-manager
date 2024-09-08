@@ -1,3 +1,4 @@
+from collections import defaultdict
 from dataclasses import dataclass
 
 from food_manager.schema import (
@@ -5,12 +6,12 @@ from food_manager.schema import (
     CompositeSubstance,
     Ration,
     Money,
+    Nutrient,
     Product,
     RationProduct,
     SubstanceProduct,
     Substance,
     Category,
-    MacroRatios,
     SimpleSubstance,
 )
 
@@ -37,46 +38,40 @@ class MacroGrams:
     """
 
 
-def get_macro_ratios(substance: Substance) -> MacroRatios:
+def get_nutrient_ratios(substance: Substance) -> dict[Nutrient, float]:
     if isinstance(substance, SimpleSubstance):
-        return substance.macros
+        return substance.nutrient_ratios
     if isinstance(substance, CompositeSubstance):
-        carb = 0.0
-        fat = 0.0
-        protein = 0.0
+        nutrient_ratios: dict[Nutrient, float] = defaultdict(float)
         total_proportion = 0.0
         for component in substance.components.values():
-            component_macro_ratios = get_macro_ratios(component.substance)
-
-            carb += component_macro_ratios.carb * component.proportion
-            fat += component_macro_ratios.fat * component.proportion
-            protein += component_macro_ratios.protein * component.proportion
+            component_nutrient_ratios = get_nutrient_ratios(component.substance)
+            for nutrient, ratio in component_nutrient_ratios.items():
+                nutrient_ratios[nutrient] += ratio * component.proportion
             total_proportion += component.proportion
-        carb /= total_proportion
-        fat /= total_proportion
-        protein /= total_proportion
-        return MacroRatios(carb=carb, fat=fat, protein=protein)
+        nutrient_ratios = {n: r / total_proportion for n, r in nutrient_ratios.items()}
+        return nutrient_ratios
     if isinstance(substance, DehydratedSubstance):
-        original_macro_ratios = get_macro_ratios(substance.original_substance)
-        return MacroRatios(
-            carb=original_macro_ratios.carb / substance.dehydration_ratio,
-            fat=original_macro_ratios.fat / substance.dehydration_ratio,
-            protein=original_macro_ratios.protein / substance.dehydration_ratio,
-        )
+        original_nutrient_ratios = get_nutrient_ratios(substance.original_substance)
+        return {
+            nutrient: original_ratio / substance.dehydration_ratio
+            for nutrient, original_ratio in original_nutrient_ratios.items()
+        }
     raise ValueError(f"Unknown substance type: {substance}")
 
 
-def get_macro_grams(ration: Ration) -> MacroGrams:
-    macro_ratios = get_macro_ratios(ration.substance)
-    return MacroGrams(
-        carb=ration.grams * macro_ratios.carb,
-        fat=ration.grams * macro_ratios.fat,
-        protein=ration.grams * macro_ratios.protein,
+def get_nutrient_grams(ration: Ration) -> dict[Nutrient, float]:
+    nutrient_ratios = get_nutrient_ratios(ration.substance)
+    return {nutrient: ration.grams * ratio for nutrient, ratio in nutrient_ratios.items()}
+
+
+def get_calories(nutrient_grams: dict[Nutrient, float]) -> float:
+    return (
+        4 * nutrient_grams.get(Nutrient.CARB, 0.0)
+        + 9 * nutrient_grams.get(Nutrient.FAT, 0.0)
+        + 4 * nutrient_grams.get(Nutrient.PROTEIN, 0.0)
+        + 7 * nutrient_grams.get(Nutrient.ETHANOL, 0.0)
     )
-
-
-def get_calories(macro_grams: MacroGrams) -> float:
-    return 4 * macro_grams.carb + 9 * macro_grams.fat + 4 * macro_grams.protein
 
 
 # --------------------------------------------------------------------------------------

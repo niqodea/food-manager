@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from enum import Enum, auto
 from pathlib import Path
 
 from balloons import Balloon, BalloonistFactory, NamedBalloon, balloon
@@ -14,25 +15,29 @@ class Category(NamedBalloon):
 
 
 # --------------------------------------------------------------------------------------
-@balloon
-class MacroRatios(Balloon):
+class Nutrient(Enum):
     """
-    The ratios of macronutrients in a food.
-    """
-
-    carb: float
-    """
-    The ratio of carbohydrates in the food.
+    A nutrient.
     """
 
-    fat: float
+    CARB = auto()
     """
-    The ratio of fat in the food.
+    Carbohydrates.
     """
 
-    protein: float
+    FAT = auto()
     """
-    The ratio of protein in the food.
+    Fat.
+    """
+
+    PROTEIN = auto()
+    """
+    Protein.
+    """
+
+    ETHANOL = auto()
+    """
+    Ethanol.
     """
 
 
@@ -55,7 +60,7 @@ class SimpleSubstance(Substance):
     A simple food substance.
     """
 
-    macros: MacroRatios
+    nutrient_ratios: dict[Nutrient, float]
     """
     The macronutrient ratios of the substance.
     """
@@ -199,7 +204,6 @@ def create_balloonist_factory(json_database_path: Path) -> BalloonistFactory:
         },
         types_={
             Category,
-            MacroRatios,
             Substance,
             SimpleSubstance,
             CompositeSubstance,
