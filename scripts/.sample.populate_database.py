@@ -4,7 +4,7 @@ from food_manager.path import DATA_PATH
 from food_manager.schema import (
     CompositeSubstance,
     DehydratedSubstance,
-    DailyMealPlan,
+    MealSlot,
     Ration,
     Substance,
     Category,
@@ -200,10 +200,10 @@ class Rations(Enum):
     ).to_named("macchiato-coffee")
 
 
-class DailyMealPlanSlots(Enum):
-    BREAKFAST = DailyMealPlan.Slot("breakfast")
-    LUNCH = DailyMealPlan.Slot("lunch")
-    DINNER = DailyMealPlan.Slot("dinner")
+class MealSlots(Enum):
+    BREAKFAST = MealSlot("breakfast")
+    LUNCH = MealSlot("lunch")
+    DINNER = MealSlot("dinner")
 
 
 balloonist_factory = create_balloonist_factory(DATA_PATH)
@@ -211,7 +211,7 @@ balloonist_factory = create_balloonist_factory(DATA_PATH)
 category_balloonist = balloonist_factory.instantiate(Category)
 substance_balloonist = balloonist_factory.instantiate(Substance)
 ration_balloonist = balloonist_factory.instantiate(Ration)
-daily_meal_plan_slot_balloonist = balloonist_factory.instantiate(DailyMealPlan.Slot)
+meal_slot_balloonist = balloonist_factory.instantiate(MealSlot)
 
 for category in Categories:
     category_balloonist.track(category.value)
@@ -219,5 +219,5 @@ for substance in Substances:
     substance_balloonist.track(substance.value)
 for ration in Rations:
     ration_balloonist.track(ration.value)
-for daily_meal_plan_slot in DailyMealPlanSlots:
-    daily_meal_plan_slot_balloonist.track(daily_meal_plan_slot.value)
+for meal_slot in MealSlots:
+    meal_slot_balloonist.track(meal_slot.value)

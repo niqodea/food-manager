@@ -117,9 +117,21 @@ class Ration(Balloon):
 
 # --------------------------------------------------------------------------------------
 @balloon
+class MealSlot(NamedBalloon):
+    """
+    A meal slot (e.g. breakfast).
+    """
+
+
+@balloon
 class Meal(Balloon):
     """
     A meal.
+    """
+
+    slot: MealSlot
+    """
+    The slot of the meal.
     """
 
     rations: dict[Category, Ration]
@@ -130,17 +142,28 @@ class Meal(Balloon):
 
 @balloon
 class DailyMealPlan(Balloon):
+    """
+    A daily meal plan.
+    """
 
-    meals: dict[Slot, Meal]
+    meals: dict[MealSlot, Meal]
     """
     The meals of the day.
     """
 
-    @balloon
-    class Slot(NamedBalloon):
-        """
-        A meal slot.
-        """
+
+class Day(Enum):
+    """
+    A day of the week.
+    """
+
+    MONDAY = auto()
+    TUESDAY = auto()
+    WEDNESDAY = auto()
+    THURSDAY = auto()
+    FRIDAY = auto()
+    SATURDAY = auto()
+    SUNDAY = auto()
 
 
 @balloon
@@ -154,18 +177,6 @@ class WeeklyMealPlan(Balloon):
     The daily meal plans of the week.
     """
 
-    class Day(Enum):
-        """
-        A day of the week.
-        """
-
-        MONDAY = auto()
-        TUESDAY = auto()
-        WEDNESDAY = auto()
-        THURSDAY = auto()
-        FRIDAY = auto()
-        SATURDAY = auto()
-        SUNDAY = auto()
 
 
 
@@ -240,7 +251,7 @@ def create_balloonist_factory(json_database_path: Path) -> BalloonistFactory:
             Substance,
             Ration,
             Product,
-            DailyMealPlan.Slot,
+            MealSlot,
         },
         types_={
             Category,
@@ -251,8 +262,8 @@ def create_balloonist_factory(json_database_path: Path) -> BalloonistFactory:
             DehydratedSubstance,
             Ration,
             Meal,
+            MealSlot,
             DailyMealPlan,
-            DailyMealPlan.Slot,
             WeeklyMealPlan,
             Money,
             Product,
