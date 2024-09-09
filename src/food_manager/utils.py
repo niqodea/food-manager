@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import defaultdict
 from dataclasses import dataclass
 
@@ -129,45 +131,48 @@ def multiply(money: Money, factor: float) -> Money:
     return Money(units=units, cents=cents)
 
 
-def get_kg_price(substance: Substance, substance_products: list[SubstanceProduct]) -> Money:
-    for product in substance_products:
-        # TODO: if product.item contains substance
-        # Then verify % of substance in product
-        # Return a conservative upper estimate of $(kg_price / %substance)
-        # Rationale: the product may contain other substances, we assume
-        # that the other substances are lost in the process of extracting
-        # In the future we might want to have an inventory data structure
-        # that keeps track of the substances we did not use
-        if product.item != substance:
-            continue
-        return product.kg_price
-    if isinstance(substance, SimpleSubstance):
+class PriceCalculator:
+
+    def __init__(self, substance_products: list[SubstanceProduct]):
+        self._substance_products = substance_products
+
+    def get_kg_price(self, substance: Substance) -> Money:
+        for product in self._substance_products:
+            if product.item is substance:
+                return product.kg_price
+
+        if isinstance(substance, CompositeSubstance):
+            total_kg_price = Money(0, 0)
+            total_proportion = 0.0
+            for component in substance.components.values():
+                kg_price = self.get_kg_price(component.substance)
+                proportional_kg_price = multiply(kg_price, component.proportion)
+                total_kg_price = sum_money(total_kg_price, proportional_kg_price)
+                total_proportion += component.proportion
+            total_kg_price = multiply(total_kg_price, 1 / total_proportion)
+            return total_kg_price
+
         raise ValueError(f"Missing price for substance: {substance}")
-    if isinstance(substance, CompositeSubstance):
-        total_kg_price = Money(0, 0)
-        total_proportion = 0.0
-        for component in substance.components.values():
-            kg_price = get_kg_price(component.substance, substance_products)
-            proportional_kg_price = multiply(kg_price, component.proportion)
-            total_kg_price = sum_money(total_kg_price, proportional_kg_price)
-            total_proportion += component.proportion
-        total_kg_price = multiply(total_kg_price, 1 / total_proportion)
-        return total_kg_price
 
-    raise ValueError(f"Unknown substance type: {substance}")
+    def get_price(self, ration: Ration) -> Money:
+        kg_price = self.get_kg_price(ration.substance)
+        kg = ration.grams / 1000
+        price = multiply(kg_price, kg)
+        return price
 
 
-def get_price(
-    ration: Ration,
-    ration_products: list[RationProduct],
-    substance_products: list[SubstanceProduct],
-) -> Money:
-    for product in ration_products:
-        if ration_product.item != ration:
-            continue
-        return product.price
+    @staticmethod
+    def create(products: list[Product]) -> PriceCalculator:
+        substance_products = []
+        for product in products:
+            if isinstance(product, SubstanceProduct):
+                substance_products.append(product)
+            elif isinstance(product, RationProduct):
+                substance = product.item.substance
+                kgs = product.item.grams / 1000
+                kg_price = multiply(product.price, 1 / kgs)
+                substance_products.append(SubstanceProduct(item=substance, kg_price=kg_price))
+            else:
+                raise ValueError(f"Unknown product type: {product}")
 
-    kg_price = get_kg_price(ration.substance, substance_products)
-    kg = ration.grams / 1000
-    price = multiply(kg_price, kg)
-    return price
+        return PriceCalculator(substance_products)

@@ -11,12 +11,14 @@ from food_manager.schema import (
     Meal,
     MealSlot,
     Nutrient,
+    Product,
     Ration,
     SimpleSubstance,
     Substance,
     WeeklyMealPlan,
     create_balloonist_factory,
 )
+from food_manager.utils import PriceCalculator
 
 balloonist_factory = create_balloonist_factory(DATA_PATH)
 
@@ -219,3 +221,11 @@ def create_meal(meal_slot: MealSlot | str, rations: list[Ration | str]) -> Meal:
         slot=meal_slot_balloon,
         rations={ration.category: ration for ration in ration_balloons},
     )
+
+
+# --------------------------------------------------------------------------------------
+# Price calculator
+
+products = balloonist_factory.instantiate(Product)
+product_balloons = [products.get(name) for name in products.get_names()]
+price_calculator = PriceCalculator.create(product_balloons)
