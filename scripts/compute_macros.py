@@ -28,7 +28,10 @@ for day, daily_meal_plan in WEEKLY_MEAL_PLAN.dailies.items():
             calories = get_calories(nutrient_grams)
 
             print(f"  {GREEN}{ration.category.name}{RESET}: {calories:.0f} calories")
-            for nutrient, grams in nutrient_grams.items():
+            for nutrient in Nutrient:
+                if (grams := nutrient_grams.get(nutrient)) is None:
+                    continue
+
                 print(f"    {grams:6.1f}g {nutrient.name.lower()}", end="")
 
                 if nutrient == Nutrient.CARB:
@@ -44,10 +47,15 @@ for day, daily_meal_plan in WEEKLY_MEAL_PLAN.dailies.items():
 
     print()
     print(f"Total: {total_calories:.0f} calories")
-    for nutrient, total_grams in total_nutrient_grams.items():
+    for nutrient in Nutrient:
+        if (total_grams := total_nutrient_grams.get(nutrient)) is None:
+            continue
+
         print(f"  {total_grams:6.1f}g {nutrient.name.lower()}", end="")
+
         if nutrient == Nutrient.CARB:
             print(f" ({total_grams / CARB_BUDGET_GRAMS * 100:3.0f}%)")
         else:
             print()
+
     print()
