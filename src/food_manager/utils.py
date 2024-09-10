@@ -141,6 +141,14 @@ class PriceCalculator:
             if product.item is substance:
                 return product.kg_price
 
+        if isinstance(substance, SimpleSubstance):
+            raise ValueError(f"Missing price for substance: {substance}")
+
+        if isinstance(substance, DehydratedSubstance):
+            original_kg_price = self.get_kg_price(substance.original_substance)
+            kg_price = multiply(original_kg_price, 1 / substance.dehydration_ratio)
+            return kg_price
+
         if isinstance(substance, CompositeSubstance):
             total_kg_price = Money(0, 0)
             total_proportion = 0.0
@@ -152,7 +160,7 @@ class PriceCalculator:
             total_kg_price = multiply(total_kg_price, 1 / total_proportion)
             return total_kg_price
 
-        raise ValueError(f"Missing price for substance: {substance}")
+        raise ValueError(f"Unknown substance type: {substance}")
 
     def get_price(self, ration: Ration) -> Money:
         kg_price = self.get_kg_price(ration.substance)

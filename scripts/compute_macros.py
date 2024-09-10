@@ -1,5 +1,4 @@
 from weekly_meal_plan import WEEKLY_MEAL_PLAN
-from weekly_meal_plan_utils import price_calculator
 
 from food_manager.schema import Nutrient
 from food_manager.utils import get_calories, get_nutrient_grams
