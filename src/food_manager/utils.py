@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import dataclass
 
+from balloons import NamedBalloon
 from food_manager.schema import (
     DehydratedSubstance,
     CompositeSubstance,
@@ -133,21 +134,28 @@ def multiply(money: Money, factor: float) -> Money:
 
 class PriceCalculator:
 
-    def __init__(self, substance_products: list[SubstanceProduct]):
-        self._substance_products = substance_products
+    def __init__(
+        self,
+        ration_prices: dict[NamedBalloon, Money],
+        substance_kg_prices: dict[NamedBalloon, Money],
+    ) -> None:
+        self._ration_prices = ration_prices
+        self._substance_kg_prices = substance_kg_prices
+
+    def get_price(self, ration: Ration) -> Money:
+        if isinstance(ration, NamedBalloon):
+            if (price := self._ration_prices.get(ration)) is not None:
+                return price
+
+        kg_price = self.get_kg_price(ration.substance)
+        kg = ration.grams / 1000
+        price = multiply(kg_price, kg)
+        return price
 
     def get_kg_price(self, substance: Substance) -> Money:
-        for product in self._substance_products:
-            if product.item is substance:
-                return product.kg_price
-
-        if isinstance(substance, SimpleSubstance):
-            raise ValueError(f"Missing price for substance: {substance}")
-
-        if isinstance(substance, DehydratedSubstance):
-            original_kg_price = self.get_kg_price(substance.original_substance)
-            kg_price = multiply(original_kg_price, 1 / substance.dehydration_ratio)
-            return kg_price
+        if isinstance(substance, NamedBalloon):
+            if (kg_price := self._substance_kg_prices.get(substance)) is not None:
+                return kg_price
 
         if isinstance(substance, CompositeSubstance):
             total_kg_price = Money(0, 0)
@@ -160,27 +168,36 @@ class PriceCalculator:
             total_kg_price = multiply(total_kg_price, 1 / total_proportion)
             return total_kg_price
 
-        raise ValueError(f"Unknown substance type: {substance}")
+        if isinstance(substance, DehydratedSubstance):
+            original_kg_price = self.get_kg_price(substance.original_substance)
+            kg_price = multiply(original_kg_price, 1 / substance.dehydration_ratio)
+            return kg_price
 
-    def get_price(self, ration: Ration) -> Money:
-        kg_price = self.get_kg_price(ration.substance)
-        kg = ration.grams / 1000
-        price = multiply(kg_price, kg)
-        return price
+        if isinstance(substance, SimpleSubstance):
+            raise ValueError(f"Missing price for substance: {substance}")
+
+        raise ValueError(f"Unknown substance type: {substance}")
 
 
     @staticmethod
     def create(products: list[Product]) -> PriceCalculator:
-        substance_products = []
+        ration_prices: dict[NamedBalloon, Money] = {}
+        substance_kg_prices: dict[NamedBalloon, Money] = {}
+
         for product in products:
-            if isinstance(product, SubstanceProduct):
-                substance_products.append(product)
-            elif isinstance(product, RationProduct):
-                substance = product.item.substance
-                kgs = product.item.grams / 1000
-                kg_price = multiply(product.price, 1 / kgs)
-                substance_products.append(SubstanceProduct(item=substance, kg_price=kg_price))
+            if isinstance(product, RationProduct):
+                if isinstance(product.item, NamedBalloon):
+                    ration_prices[product.item] = product.price
+                if isinstance(product.item.substance, NamedBalloon):
+                    kgs = product.item.grams / 1000
+                    kg_price = multiply(product.price, 1 / kgs)
+                    substance_kg_prices[product.item.substance] = kg_price
+            elif isinstance(product, SubstanceProduct):
+                if isinstance(product.item, NamedBalloon):
+                    substance_kg_prices[product.item] = product.kg_price
             else:
                 raise ValueError(f"Unknown product type: {product}")
 
-        return PriceCalculator(substance_products)
+        return PriceCalculator(
+            ration_prices=ration_prices, substance_kg_prices=substance_kg_prices
+        )
