@@ -68,7 +68,7 @@ def get_nutrient_grams(ration: Ration) -> dict[Nutrient, float]:
     return {nutrient: ration.grams * ratio for nutrient, ratio in nutrient_ratios.items()}
 
 
-def get_calories(nutrient_grams: dict[Nutrient, float]) -> float:
+def get_kcal(nutrient_grams: dict[Nutrient, float]) -> float:
     return (
         4 * nutrient_grams.get(Nutrient.CARB, 0.0)
         + 9 * nutrient_grams.get(Nutrient.FAT, 0.0)

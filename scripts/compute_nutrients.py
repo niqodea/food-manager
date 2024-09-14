@@ -1,7 +1,7 @@
 from weekly_meal_plan import WEEKLY_MEAL_PLAN
 
 from food_manager.schema import Nutrient
-from food_manager.utils import get_calories, get_nutrient_grams
+from food_manager.utils import get_kcal, get_nutrient_grams
 
 CARB_BUDGET_GRAMS = 20.0
 
@@ -20,14 +20,14 @@ for day, daily_meal_plan in WEEKLY_MEAL_PLAN.dailies.items():
     print(f"{'-' * len(day.name)}")
     print(RESET, end="")
     total_nutrient_grams: dict[Nutrient, float] = {}
-    total_calories = 0.0
+    total_kcal = 0.0
     for meal_slot, meal in daily_meal_plan.meals.items():
         print(f"{YELLOW}{meal_slot.name.capitalize()}:{RESET}")
         for ration in meal.rations.values():
             nutrient_grams = get_nutrient_grams(ration)
-            calories = get_calories(nutrient_grams)
+            kcal = get_kcal(nutrient_grams)
 
-            print(f"  {GREEN}{ration.category.name}{RESET}: {calories:.0f} calories")
+            print(f"  {GREEN}{ration.category.name}{RESET}: {kcal:.0f} kcal")
             for nutrient in Nutrient:
                 if (grams := nutrient_grams.get(nutrient)) is None:
                     continue
@@ -43,10 +43,10 @@ for day, daily_meal_plan in WEEKLY_MEAL_PLAN.dailies.items():
                 total_nutrient_grams[nutrient] = (
                     total_nutrient_grams.get(nutrient, 0.0) + grams
                 )
-            total_calories += calories
+            total_kcal += kcal
 
     print()
-    print(f"Total: {total_calories:.0f} calories")
+    print(f"Total: {total_kcal:.0f} kcal")
     for nutrient in Nutrient:
         if (total_grams := total_nutrient_grams.get(nutrient)) is None:
             continue
