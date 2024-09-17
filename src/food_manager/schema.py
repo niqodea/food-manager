@@ -3,7 +3,7 @@ from __future__ import annotations
 from enum import Enum, auto
 from pathlib import Path
 
-from balloons import Balloon, BalloonistFactory, NamedBalloon, balloon
+from balloons import Balloon, ClosedBalloonWorld, NamedBalloon, balloon
 
 
 # --------------------------------------------------------------------------------------
@@ -239,19 +239,18 @@ class SubstanceProduct(Product):
 
 
 # --------------------------------------------------------------------------------------
-def create_balloonist_factory(json_database_path: Path) -> BalloonistFactory:
+def create_base_world() -> ClosedBalloonWorld:
     """
-    Create a BalloonistFactory for the Food Manager schema.
-
-    :param json_database_path: The path to the JSON database.
+    Create a base world for the Food Manager schema.
     """
-    return BalloonistFactory.create(
-        top_namespace_types={
+    return ClosedBalloonWorld.create(
+        namespace_types={
             Category,
             Substance,
             Ration,
             Product,
             MealSlot,
+            WeeklyMealPlan,
         },
         types_={
             Category,
@@ -270,5 +269,4 @@ def create_balloonist_factory(json_database_path: Path) -> BalloonistFactory:
             RationProduct,
             SubstanceProduct,
         },
-        json_database_path=json_database_path,
     )

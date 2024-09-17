@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from food_manager.path import DATA_PATH
+from food_manager.path import GLOBAL_DATABASE_PATH, WEEKLY_DATABASES_PATH
 from food_manager.schema import (
     Category,
     CompositeSubstance,
@@ -16,53 +16,19 @@ from food_manager.schema import (
     SimpleSubstance,
     Substance,
     WeeklyMealPlan,
-    create_balloonist_factory,
+    create_base_world,
 )
 from food_manager.utils import PriceCalculator
 
-balloonist_factory = create_balloonist_factory(DATA_PATH)
+WEEK = "current"
 
+world = create_base_world().populate(GLOBAL_DATABASE_PATH).to_open(WEEKLY_DATABASES_PATH / WEEK)
 
-# --------------------------------------------------------------------------------------
-# Global and weekly objects
-categories = balloonist_factory.instantiate(Category)
-substances = balloonist_factory.instantiate(Substance)
-rations = balloonist_factory.instantiate(Ration)
-meal_slots = balloonist_factory.instantiate(MealSlot)
-
-weekly_categories: dict[str, Category] = {}
-weekly_substances: dict[str, Substance] = {}
-weekly_rations: dict[str, Ration] = {}
-weekly_meal_slots: dict[str, MealSlot] = {}
-
-
-def get_category(name: str) -> Category:
-    if name in weekly_categories:
-        return weekly_categories[name]
-    else:
-        return categories.get(name)
-
-
-def get_substance(name: str) -> Substance:
-    if name in weekly_substances:
-        return weekly_substances[name]
-    else:
-        return substances.get(name)
-
-
-def get_ration(name: str) -> Ration:
-    if name in weekly_rations:
-        return weekly_rations[name]
-    else:
-        return rations.get(name)
-
-
-def get_meal_slot(name: str) -> MealSlot:
-    if name in weekly_meal_slots:
-        return weekly_meal_slots[name]
-    else:
-        return meal_slots.get(name)
-
+category_balloonist = world.get_balloonist(Category)
+substance_balloonist = world.get_balloonist(Substance)
+ration_balloonist = world.get_balloonist(Ration)
+meal_slot_balloonist = world.get_balloonist(MealSlot)
+product_balloonist = world.get_balloonist(Product)
 
 # --------------------------------------------------------------------------------------
 # Helper methods to easily create weekly objects with minimal boilerplate
@@ -80,7 +46,7 @@ def create_simple_substance(
     if isinstance(category, Category):
         category_balloon = category
     elif isinstance(category, str):
-        category_balloon = get_category(category)
+        category_balloon = category_balloonist.get(category)
 
     nutrient_ratios: dict[Nutrient, float] = {}
     if carb is not None:
@@ -104,14 +70,14 @@ def create_composite_substance(
     if isinstance(category, Category):
         category_balloon = category
     elif isinstance(category, str):
-        category_balloon = get_category(category)
+        category_balloon = category_balloonist.get(category)
 
     substance_balloon_proportions: list[tuple[Substance, float]] = []
     for substance, proportion in substance_proportions:
         if isinstance(substance, Substance):
             substance_balloon = substance
         elif isinstance(substance, str):
-            substance_balloon = get_substance(substance)
+            substance_balloon = substance_balloonist.get(substance)
         substance_balloon_proportions.append((substance_balloon, proportion))
 
     return CompositeSubstance(
@@ -129,7 +95,7 @@ def create_ration_from_substance(substance: Substance | str, grams: float) -> Ra
     if isinstance(substance, Substance):
         substance_balloon = substance
     elif isinstance(substance, str):
-        substance_balloon = get_substance(substance)
+        substance_balloon = substance_balloonist.get(substance)
 
     return Ration(
         category=substance_balloon.category, substance=substance_balloon, grams=grams
@@ -142,14 +108,14 @@ def create_ration_from_substances(
     if isinstance(category, Category):
         category_balloon = category
     elif isinstance(category, str):
-        category_balloon = get_category(category)
+        category_balloon = category_balloonist.get(category)
 
     substance_balloon_grams: list[tuple[Substance, float]] = []
     for substance, grams in substance_grams:
         if isinstance(substance, Substance):
             substance_balloon = substance
         elif isinstance(substance, str):
-            substance_balloon = get_substance(substance)
+            substance_balloon = substance_balloonist.get(substance)
         substance_balloon_grams.append((substance_balloon, grams))
 
     return Ration(
@@ -208,14 +174,14 @@ def create_meal(meal_slot: MealSlot | str, rations: list[Ration | str]) -> Meal:
     if isinstance(meal_slot, MealSlot):
         meal_slot_balloon = meal_slot
     elif isinstance(meal_slot, str):
-        meal_slot_balloon = get_meal_slot(meal_slot)
+        meal_slot_balloon = meal_slot_balloonist.get(meal_slot)
 
     ration_balloons: list[Ration] = []
     for ration in rations:
         if isinstance(ration, Ration):
             ration_balloons.append(ration)
         elif isinstance(ration, str):
-            ration_balloons.append(get_ration(ration))
+            ration_balloons.append(ration_balloonist.get(ration))
 
     return Meal(
         slot=meal_slot_balloon,
@@ -224,8 +190,146 @@ def create_meal(meal_slot: MealSlot | str, rations: list[Ration | str]) -> Meal:
 
 
 # --------------------------------------------------------------------------------------
-# Price calculator
+# Weekly object creation
 
-products = balloonist_factory.instantiate(Product)
-product_balloons = [products.get(name) for name in products.get_names()]
-price_calculator = PriceCalculator.create(product_balloons)
+ration_balloonist.track(
+    create_ration_from_substance(
+        substance="eggplant-parmesan", grams=250.0
+    ).to_named("prepped-eggplant-parmesan")
+)
+
+# --------------------------------------------------------------------------------------
+# Weekly meal plan
+
+weekly_meal_plan = create_weekly_meal_plan(
+    monday=create_daily_meal_plan(
+        create_meal(
+            "breakfast",
+            rations=[
+                "greek-yogurt",
+                "coffee",
+            ],
+        ),
+        create_meal(
+            "lunch",
+            rations=[
+                create_ration_from_substance("sauteed-chicken", grams=260.0),
+            ],
+        ),
+        create_meal(
+            "dinner",
+            rations=[
+                create_ration_from_substance("sauteed-tuna", grams=200.0),
+            ],
+        ),
+    ),
+    tuesday=create_daily_meal_plan(
+        create_meal(
+            "breakfast",
+            rations=[
+                "banana",
+            ],
+        ),
+        create_meal(
+            "lunch",
+            rations=[
+                create_ration_from_substance("salad", grams=200.0),
+            ],
+        ),
+        create_meal(
+            "dinner",
+            rations=[
+                "prepped-eggplant-parmesan",
+                "coffee",
+            ],
+        )
+    ),
+#     wednesday=create_daily_meal_plan(
+#         create_meal(
+#             "breakfast",
+#             rations=[
+#             ],
+#         ),
+#         create_meal(
+#             "lunch",
+#             rations=[
+#             ],
+#         ),
+#         create_meal(
+#             "dinner",
+#             rations=[
+#             ],
+#         ),
+#     ),
+#     thursday=create_daily_meal_plan(
+#         create_meal(
+#             "breakfast",
+#             rations=[
+#             ],
+#         ),
+#         create_meal(
+#             "lunch",
+#             rations=[
+#             ],
+#         ),
+#         create_meal(
+#             "dinner",
+#             rations=[
+#             ],
+#         ),
+#     ),
+#     friday=create_daily_meal_plan(
+#         create_meal(
+#             "breakfast",
+#             rations=[
+#             ],
+#         ),
+#         create_meal(
+#             "lunch",
+#             rations=[
+#             ],
+#         ),
+#         create_meal(
+#             "dinner",
+#             rations=[
+#             ],
+#         ),
+#     ),
+#     saturday=create_daily_meal_plan(
+#         create_meal(
+#             "breakfast",
+#             rations=[
+#             ],
+#         ),
+#         create_meal(
+#             "lunch",
+#             rations=[
+#             ],
+#         ),
+#         create_meal(
+#             "dinner",
+#             rations=[
+#             ],
+#         ),
+#     ),
+#     sunday=create_daily_meal_plan(
+#         create_meal(
+#             "breakfast",
+#             rations=[
+#             ],
+#         ),
+#         create_meal(
+#             "lunch",
+#             rations=[
+#             ],
+#         ),
+#         create_meal(
+#             "dinner",
+#             rations=[
+#             ],
+#         ),
+#     ),
+).to_named("singleton")
+
+weekly_meal_plan_tracker = world.get_tracker(WeeklyMealPlan)
+weekly_meal_plan_tracker.track(weekly_meal_plan)

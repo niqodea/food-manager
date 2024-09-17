@@ -1,7 +1,10 @@
-from weekly_meal_plan import WEEKLY_MEAL_PLAN
-
-from food_manager.schema import Nutrient
+from food_manager.path import GLOBAL_DATABASE_PATH, CURRENT_WEEKLY_DATABASE_PATH
+from food_manager.schema import Nutrient, WeeklyMealPlan, create_base_world
 from food_manager.utils import get_kcal, get_nutrient_grams
+
+world = create_base_world().populate(GLOBAL_DATABASE_PATH).populate(CURRENT_WEEKLY_DATABASE_PATH)
+weekly_meal_plan_provider = world.get_provider(WeeklyMealPlan)
+weekly_meal_plan = weekly_meal_plan_provider.get("singleton")
 
 CARB_BUDGET_GRAMS = 20.0
 
@@ -10,7 +13,7 @@ YELLOW = "\033[33m"
 
 RESET = "\033[0m"
 
-for day, daily_meal_plan in WEEKLY_MEAL_PLAN.dailies.items():
+for day, daily_meal_plan in weekly_meal_plan.dailies.items():
     if len(daily_meal_plan.meals) == 0:
         continue
 
