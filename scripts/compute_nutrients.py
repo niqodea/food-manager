@@ -1,10 +1,13 @@
-from food_manager.path import GLOBAL_DATABASE_PATH, CURRENT_WEEKLY_DATABASE_PATH
+import json
+
+from food_manager.path import BALLOONS_PATH, CURRENT_WEEK_BALLOONS_PATH, CURRENT_WEEK_DATA_PATH
 from food_manager.schema import Nutrient, WeeklyMealPlan, create_base_world
 from food_manager.utils import get_kcal, get_nutrient_grams
 
-world = create_base_world().populate(GLOBAL_DATABASE_PATH).populate(CURRENT_WEEKLY_DATABASE_PATH)
-weekly_meal_plan_provider = world.get_provider(WeeklyMealPlan)
-weekly_meal_plan = weekly_meal_plan_provider.get("singleton")
+world = create_base_world().populate(BALLOONS_PATH).populate(CURRENT_WEEK_BALLOONS_PATH)
+weekly_meal_plan_balloonist = world.get_balloonist(WeeklyMealPlan)
+deflated_weekly_meal_plan = json.loads((CURRENT_WEEK_DATA_PATH / "meal-plan.json").read_text())
+weekly_meal_plan = weekly_meal_plan_balloonist.inflate(deflated_weekly_meal_plan)
 
 CARB_BUDGET_GRAMS = 20.0
 

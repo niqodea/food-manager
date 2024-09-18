@@ -250,7 +250,6 @@ def create_base_world() -> ClosedBalloonWorld:
             Ration,
             Product,
             MealSlot,
-            WeeklyMealPlan,
         },
         types_={
             Category,
