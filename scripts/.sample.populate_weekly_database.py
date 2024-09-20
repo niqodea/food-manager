@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from food_manager.path import BALLOONS_PATH, CURRENT_WEEK_BALLOONS_PATH
+from food_manager.path import WORLD_PATH, CURRENT_WEEK_WORLD_PATH
 from food_manager.schema import (
     Category,
     CompositeSubstance,
@@ -18,7 +18,7 @@ from food_manager.schema import (
 )
 from food_manager.utils import PriceCalculator
 
-world = create_base_world().populate(BALLOONS_PATH).to_open(CURRENT_WEEK_BALLOONS_PATH)
+world = create_base_world().populate(WORLD_PATH).to_open(CURRENT_WEEK_WORLD_PATH)
 
 category_manager = world.get_manager(Category)
 substance_manager = world.get_manager(Substance)

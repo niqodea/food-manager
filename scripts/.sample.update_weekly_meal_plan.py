@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from food_manager.path import BALLOONS_PATH, CURRENT_WEEK_BALLOONS_PATH, CURRENT_WEEK_DATA_PATH
+from food_manager.path import WORLD_PATH, CURRENT_WEEK_WORLD_PATH, CURRENT_WEEK_DATA_PATH
 from food_manager.schema import (
     Category,
     CompositeSubstance,
@@ -18,7 +18,7 @@ from food_manager.schema import (
     create_base_world,
 )
 
-world = create_base_world().populate(BALLOONS_PATH).populate(CURRENT_WEEK_BALLOONS_PATH)
+world = create_base_world().populate(WORLD_PATH).populate(CURRENT_WEEK_WORLD_PATH)
 
 category_provider = world.get_provider(Category)
 substance_provider = world.get_provider(Substance)

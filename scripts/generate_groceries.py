@@ -1,10 +1,10 @@
 import json
 
-from food_manager.path import BALLOONS_PATH, CURRENT_WEEK_BALLOONS_PATH, CURRENT_WEEK_DATA_PATH
+from food_manager.path import WORLD_PATH, CURRENT_WEEK_WORLD_PATH, CURRENT_WEEK_DATA_PATH
 from food_manager.schema import WeeklyMealPlan, create_base_world
 from food_manager.utils import get_category_grams
 
-world = create_base_world().populate(BALLOONS_PATH).populate(CURRENT_WEEK_BALLOONS_PATH)
+world = create_base_world().populate(WORLD_PATH).populate(CURRENT_WEEK_WORLD_PATH)
 weekly_meal_plan_balloonist = world.get_balloonist(WeeklyMealPlan)
 deflated_weekly_meal_plan = json.loads((CURRENT_WEEK_DATA_PATH / "meal-plan.json").read_text())
 weekly_meal_plan = weekly_meal_plan_balloonist.inflate(deflated_weekly_meal_plan)
