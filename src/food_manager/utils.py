@@ -142,17 +142,19 @@ class PriceCalculator:
         self._ration_prices = ration_prices
         self._substance_kg_prices = substance_kg_prices
 
-    def get_price(self, ration: Ration) -> Money:
+    def get_price(self, ration: Ration) -> Money | None:
         if isinstance(ration, NamedBalloon):
             if (price := self._ration_prices.get(ration)) is not None:
                 return price
 
-        kg_price = self.get_kg_price(ration.substance)
-        kg = ration.grams / 1000
-        price = multiply(kg_price, kg)
-        return price
+        if (kg_price := self.get_kg_price(ration.substance)) is not None:
+            kg = ration.grams / 1000
+            price = multiply(kg_price, kg)
+            return price
 
-    def get_kg_price(self, substance: Substance) -> Money:
+        return None
+
+    def get_kg_price(self, substance: Substance) -> Money | None:
         if isinstance(substance, NamedBalloon):
             if (kg_price := self._substance_kg_prices.get(substance)) is not None:
                 return kg_price
@@ -161,7 +163,8 @@ class PriceCalculator:
             total_kg_price = Money(0, 0)
             total_proportion = 0.0
             for component in substance.components.values():
-                kg_price = self.get_kg_price(component.substance)
+                if (kg_price := self.get_kg_price(component.substance)) is None:
+                    return None
                 proportional_kg_price = multiply(kg_price, component.proportion)
                 total_kg_price = sum_money(total_kg_price, proportional_kg_price)
                 total_proportion += component.proportion
@@ -169,12 +172,13 @@ class PriceCalculator:
             return total_kg_price
 
         if isinstance(substance, DehydratedSubstance):
-            original_kg_price = self.get_kg_price(substance.original_substance)
+            if (original_kg_price := self.get_kg_price(substance.original_substance)) is None:
+                return None
             kg_price = multiply(original_kg_price, 1 / substance.dehydration_ratio)
             return kg_price
 
         if isinstance(substance, SimpleSubstance):
-            raise ValueError(f"Missing price for substance: {substance}")
+            return None
 
         raise ValueError(f"Unknown substance type: {substance}")
 
