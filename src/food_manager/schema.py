@@ -72,7 +72,7 @@ class CompositeSubstance(Substance):
         The proportion of the component in the composite substance.
         """
 
-    components: dict[Category, Component]
+    components: tuple[Component, ...]
     """
     The components in the composite substance.
     """
@@ -101,10 +101,6 @@ class Ration(Balloon):
     A food ration.
     """
 
-    category: Category
-    """
-    The category of the ration.
-    """
     substance: Substance
     """
     The substance of the ration.
@@ -134,9 +130,9 @@ class Meal(Balloon):
     The slot of the meal.
     """
 
-    rations: dict[Category, Ration]
+    rations: tuple[Ration, ...]
     """
-    The rations of the meal
+    The rations of the meal.
     """
 
 

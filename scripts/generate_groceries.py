@@ -12,7 +12,7 @@ weekly_meal_plan = weekly_meal_plan_balloonist.inflate(deflated_weekly_meal_plan
 category_grams: dict[str, float] = {}
 for daily_meal_plan in weekly_meal_plan.dailies.values():
     for meal in daily_meal_plan.meals.values():
-        for food in meal.rations.values():
+        for food in meal.rations:
             for category, grams in get_category_grams(food).items():
                 category_name = category.name
                 category_grams[category_name] = (

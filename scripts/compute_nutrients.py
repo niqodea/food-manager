@@ -38,11 +38,11 @@ def main(nutrient_budgets: dict[Nutrient, float]) -> None:
         print(RESET, end="")
         for meal_slot, meal in daily_meal_plan.meals.items():
             print(f"{YELLOW}{meal_slot.name.capitalize()}:{RESET}")
-            for ration in meal.rations.values():
+            for ration in meal.rations:
                 nutrient_grams = get_nutrient_grams(ration)
                 kcal = get_kcal(nutrient_grams)
 
-                print(f"  {GREEN}{ration.category.name}{RESET}: {kcal:.0f} kcal")
+                print(f"  {GREEN}{ration.substance.category.name}{RESET}: {kcal:.0f} kcal")
                 for nutrient in Nutrient:
                     if (grams := nutrient_grams.get(nutrient)) is None:
                         continue

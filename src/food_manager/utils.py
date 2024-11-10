@@ -47,7 +47,7 @@ def get_nutrient_ratios(substance: Substance) -> dict[Nutrient, float]:
     if isinstance(substance, CompositeSubstance):
         nutrient_ratios: dict[Nutrient, float] = defaultdict(float)
         total_proportion = 0.0
-        for component in substance.components.values():
+        for component in substance.components:
             component_nutrient_ratios = get_nutrient_ratios(component.substance)
             for nutrient, ratio in component_nutrient_ratios.items():
                 nutrient_ratios[nutrient] += ratio * component.proportion
@@ -86,7 +86,7 @@ def get_category_proportions(substance: Substance) -> dict[Category, float]:
     if isinstance(substance, CompositeSubstance):
         proportions: dict[Category, float] = {}
         total_proportion = 0.0
-        for component in substance.components.values():
+        for component in substance.components:
             component_proportions = get_category_proportions(component.substance)
             for category, proportion in component_proportions.items():
                 proportions[category] = (
@@ -162,7 +162,7 @@ class PriceCalculator:
         if isinstance(substance, CompositeSubstance):
             total_kg_price = Money(0, 0)
             total_proportion = 0.0
-            for component in substance.components.values():
+            for component in substance.components:
                 if (kg_price := self.get_kg_price(component.substance)) is None:
                     return None
                 proportional_kg_price = multiply(kg_price, component.proportion)

@@ -32,17 +32,17 @@ for day, daily_meal_plan in weekly_meal_plan.dailies.items():
     print(RESET, end="")
     for meal_slot, meal in daily_meal_plan.meals.items():
         print(f"{YELLOW}{meal_slot.name.capitalize()}:{RESET}")
-        for ration in meal.rations.values():
+        for ration in meal.rations:
             if (price := price_calculator.get_price(ration)) is not None:
                 day_price = sum_money(day_price, price)
                 print(
                     f"{price.units:3}.{price.cents:0>2} EUR  "
-                    f"{GREEN}{ration.category.name}{RESET}"
+                    f"{GREEN}{ration.substance.category.name}{RESET}"
                 )
             else:
                 print(
                     "  ?.?? EUR  "
-                    f"{GREEN}{ration.category.name}{RESET}"
+                    f"{GREEN}{ration.substance.category.name}{RESET}"
                 )
     week_price = sum_money(week_price, day_price)
     print()
